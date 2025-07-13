@@ -6,7 +6,7 @@ import { GradientView } from '../components/ui/GradientView';
 import AppHeader from '../components/AppHeader';
 import ScenarioCard from '../components/ScenarioCard';
 import { Gradients } from '../constants/Colors';
-import { scenarios } from '../data/scenarios';
+import { characters } from '../data/characters';
 import { Scenario } from '../types';
 
 export default function ScenarioSelectScreen() {
@@ -17,6 +17,9 @@ export default function ScenarioSelectScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalScenario, setModalScenario] = useState<Scenario | null>(null);
   const fadeAnim = useState(new Animated.Value(0))[0];
+
+  const selectedCharacter = characters.find(char => char.id === characterId);
+  const scenarios = selectedCharacter?.scenarios || [];
 
   const handleScenarioSelect = (scenario: Scenario) => {
     setSelectedScenario(scenario);

@@ -4,6 +4,7 @@ export interface Character {
   image: any; // For React Native image requires
   description: string;
   voiceType: "stern" | "gentle" | "caring" | "professional" | "heroic";
+  scenarios: Scenario[];
 }
 
 export interface Scenario {

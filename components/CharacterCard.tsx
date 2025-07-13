@@ -39,6 +39,7 @@ export const CharacterCard = ({
       </View>
       <Text style={styles.name}>{character.name}</Text>
       <Text style={styles.description}>{character.description}</Text>
+      <Text style={styles.scenarioCount}>{character.scenarios.length}개 시나리오</Text>
     </TouchableOpacity>
   );
 };
@@ -102,5 +103,12 @@ const styles = StyleSheet.create({
     color: '#666666',
     textAlign: 'center',
     lineHeight: 16,
+    marginBottom: 4,
+  },
+  scenarioCount: {
+    fontSize: 11,
+    color: 'hsl(210, 85%, 65%)',
+    textAlign: 'center',
+    fontWeight: '500',
   },
 });
