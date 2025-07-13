@@ -53,7 +53,7 @@ export default function PhoneCallScreen() {
       clearInterval(interval);
       pulseAnimation.stop();
     };
-  }, []);
+  }, [pulseAnim]);
 
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);

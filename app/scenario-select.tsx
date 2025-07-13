@@ -63,7 +63,7 @@ export default function ScenarioSelectScreen() {
         useNativeDriver: true,
       }).start();
     }
-  }, [modalVisible]);
+  }, [modalVisible, fadeAnim]);
 
   return (
     <GradientView colors={Gradients.background} style={styles.container}>
