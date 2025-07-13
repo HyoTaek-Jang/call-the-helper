@@ -14,7 +14,7 @@ export default function HomeScreen() {
         아이와 함께하는 따뜻한 교육 도우미
       </ThemedText>
 
-      <ThemedView style={styles.buttonContainer}>
+      <ThemedView style={styles.buttonContainer} lightColor="transparent">
         <Link href="/character-select" asChild>
           <TouchableOpacity style={styles.button}>
             <ThemedText style={styles.buttonText}>시작하기</ThemedText>
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   button: {
-    backgroundColor: '#007AFF',
+    backgroundColor: 'hsl(210, 85%, 65%)',
     paddingHorizontal: 40,
     paddingVertical: 15,
     borderRadius: 25,
