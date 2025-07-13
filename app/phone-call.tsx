@@ -12,7 +12,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, router } from 'expo-router';
 import { characters } from '../data/characters';
-import { scenarios } from '../data/scenarios';
 
 export default function PhoneCallScreen() {
   const params = useLocalSearchParams();
@@ -26,7 +25,7 @@ export default function PhoneCallScreen() {
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   const character = characters.find(c => c.id === characterId);
-  const scenario = scenarios.find(s => s.id === scenarioId);
+  const scenario = character?.scenarios.find(s => s.id === scenarioId);
 
   useEffect(() => {
     const interval = setInterval(() => {
