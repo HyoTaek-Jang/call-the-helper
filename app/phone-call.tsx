@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   StyleSheet, 
   View, 
@@ -22,8 +22,8 @@ export default function PhoneCallScreen() {
   const [callDuration, setCallDuration] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   
-  const pulseAnim = new Animated.Value(1);
-  const scaleAnim = new Animated.Value(1);
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+  const scaleAnim = useRef(new Animated.Value(1)).current;
 
   const character = characters.find(c => c.id === characterId);
   const scenario = scenarios.find(s => s.id === scenarioId);
