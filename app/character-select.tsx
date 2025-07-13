@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { StyleSheet, ScrollView, View, Text, TouchableOpacity } from 'react-native';
 import { router } from 'expo-router';
 import { CharacterCard } from '../components/CharacterCard';
-import { ThemedView } from '../components/ui/ThemedView';
 import { GradientView } from '../components/ui/GradientView';
 import AppHeader from '../components/AppHeader';
 import { characters } from '../data/characters';

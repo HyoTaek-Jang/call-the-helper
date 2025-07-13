@@ -13,13 +13,13 @@ interface GradientViewProps {
 export function GradientView({ 
   children, 
   style, 
-  colors = ['#f8f9fa', '#e9ecef', '#f8f9fa'],
+  colors = ['#f8f9fa', '#e9ecef'],
   start = { x: 0, y: 0 },
   end = { x: 1, y: 1 }
 }: GradientViewProps) {
   return (
     <LinearGradient
-      colors={colors}
+      colors={colors as any}
       start={start}
       end={end}
       style={style}

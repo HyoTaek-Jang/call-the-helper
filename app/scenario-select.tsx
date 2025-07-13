@@ -135,7 +135,7 @@ export default function ScenarioSelectScreen() {
             </View>
             
             <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
-              <Text style={styles.modalScript}>"{modalScenario?.script}"</Text>
+              <Text style={styles.modalScript}>&ldquo;{modalScenario?.script}&rdquo;</Text>
               
               <View style={styles.modalInfo}>
                 <View style={styles.modalInfoItem}>
