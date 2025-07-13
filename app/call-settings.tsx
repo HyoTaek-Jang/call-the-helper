@@ -120,7 +120,7 @@ export default function CallSettingsScreen() {
         <AppHeader 
           title="전화 대기 중" 
           currentStep={3} 
-          totalSteps={4}
+          totalSteps={3}
           showBackButton={false}
         />
         <View style={styles.waitingContainer}>
@@ -149,7 +149,7 @@ export default function CallSettingsScreen() {
       <AppHeader 
         title="전화 설정" 
         currentStep={3} 
-        totalSteps={4}
+        totalSteps={3}
       />
       
       <View style={styles.content}>
@@ -173,7 +173,7 @@ export default function CallSettingsScreen() {
                     <Ionicons 
                       name={option.icon as any} 
                       size={24} 
-                      color={selectedTiming === option.id ? '#ffffff' : 'hsl(210, 85%, 65%)'} 
+                      color={'hsl(210, 85%, 65%)'} 
                     />
                     <View style={styles.timingOptionText}>
                       <Text style={[
@@ -195,7 +195,7 @@ export default function CallSettingsScreen() {
                     </View>
                   </View>
                   {selectedTiming === option.id && (
-                    <Ionicons name="checkmark-circle" size={24} color="#ffffff" />
+                    <Ionicons name="checkmark-circle" size={24} color="hsl(210, 85%, 65%)" />
                   )}
                 </View>
               </TouchableOpacity>
@@ -257,7 +257,7 @@ export default function CallSettingsScreen() {
                   ]}
                   value={customMinutes}
                   onChangeText={setCustomMinutes}
-                  placeholder="분"
+                  placeholder=""
                   keyboardType="numeric"
                   maxLength={2}
                 />
@@ -331,8 +331,8 @@ const styles = StyleSheet.create({
     borderColor: '#e0e0e0',
   },
   timingOptionSelected: {
-    backgroundColor: 'hsl(210, 85%, 65%)',
-    borderColor: 'hsl(210, 85%, 55%)',
+    backgroundColor: '#F0F8FF',
+    borderColor: 'hsl(210, 85%, 65%)',
   },
   timingOptionContent: {
     flexDirection: 'row',
@@ -355,14 +355,14 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   timingOptionLabelSelected: {
-    color: '#ffffff',
+    color: '#333333',
   },
   timingOptionDescription: {
     fontSize: 14,
     color: '#666666',
   },
   timingOptionDescriptionSelected: {
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: '#666666',
   },
   bottomSection: {
     paddingHorizontal: 20,

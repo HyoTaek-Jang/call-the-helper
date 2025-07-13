@@ -45,7 +45,7 @@ export default function CharacterSelectScreen() {
       <AppHeader 
         title="캐릭터 선택" 
         currentStep={1} 
-        totalSteps={4}
+        totalSteps={3}
       />
       
       <View style={styles.content}>
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
   bottomSection: {
     backgroundColor: '#ffffff',
     paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingVertical: 20,
     borderTopWidth: 1,
     borderTopColor: '#e0e0e0',
   },

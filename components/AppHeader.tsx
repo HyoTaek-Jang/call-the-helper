@@ -15,7 +15,7 @@ interface AppHeaderProps {
 export default function AppHeader({ 
   title, 
   currentStep, 
-  totalSteps = 4,
+  totalSteps = 3,
   showBackButton = true 
 }: AppHeaderProps) {
   const router = useRouter();
