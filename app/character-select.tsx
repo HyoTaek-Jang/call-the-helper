@@ -31,7 +31,13 @@ export default function CharacterSelectScreen() {
 
   const handleContinue = () => {
     if (selectedCharacter) {
-      router.push('/scenario-select');
+      router.push({
+        pathname: '/scenario-select',
+        params: {
+          characterId: selectedCharacter.id,
+          characterName: selectedCharacter.name,
+        }
+      });
     }
   };
 

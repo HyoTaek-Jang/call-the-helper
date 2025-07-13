@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { StyleSheet, ScrollView, TouchableOpacity, View, Text, Modal, Animated } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { GradientView } from '../components/ui/GradientView';
 import AppHeader from '../components/AppHeader';
@@ -10,6 +10,9 @@ import { scenarios } from '../data/scenarios';
 import { Scenario } from '../types';
 
 export default function ScenarioSelectScreen() {
+  const params = useLocalSearchParams();
+  const characterId = params.characterId as string;
+  const characterName = params.characterName as string;
   const [selectedScenario, setSelectedScenario] = useState<Scenario | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalScenario, setModalScenario] = useState<Scenario | null>(null);
@@ -21,8 +24,16 @@ export default function ScenarioSelectScreen() {
 
   const handleContinue = () => {
     if (selectedScenario) {
-      // TODO: Pass selected scenario to next screen
-      router.push('/call-settings');
+      router.push({
+        pathname: '/call-settings',
+        params: {
+          characterId,
+          characterName,
+          scenarioId: selectedScenario.id,
+          scenarioTitle: selectedScenario.title,
+          scenarioCategory: selectedScenario.category,
+        }
+      });
     }
   };
 
