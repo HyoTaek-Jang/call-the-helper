@@ -6,8 +6,10 @@ interface ScenarioCardProps {
   description: string;
   category: string;
   duration: string;
+  script: string;
   isSelected?: boolean;
   onPress: () => void;
+  onViewScript?: () => void;
 }
 
 const getCategoryIcon = (category: string): keyof typeof Ionicons.glyphMap => {
@@ -32,8 +34,10 @@ export default function ScenarioCard({
   description,
   category,
   duration,
+  script,
   isSelected = false,
   onPress,
+  onViewScript,
 }: ScenarioCardProps) {
   const primaryColor = 'hsl(210, 85%, 65%)';
   const cardBackgroundColor = '#ffffff';
@@ -83,6 +87,21 @@ export default function ScenarioCard({
             {duration}
           </Text>
         </View>
+        {onViewScript && (
+          <TouchableOpacity 
+            style={styles.viewScriptButton}
+            onPress={() => {
+              console.log('전체보기 버튼 터치됨');
+              onViewScript();
+            }}
+            activeOpacity={0.7}
+          >
+            <Text style={[styles.viewScriptText, { color: primaryColor }]}>
+              전체보기
+            </Text>
+            <Ionicons name="chevron-forward" size={14} color={primaryColor} />
+          </TouchableOpacity>
+        )}
       </View>
     </TouchableOpacity>
   );
@@ -168,5 +187,16 @@ const styles = StyleSheet.create({
   },
   duration: {
     fontSize: 12,
+  },
+  viewScriptButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  viewScriptText: {
+    fontSize: 12,
+    fontWeight: '500',
   },
 });
