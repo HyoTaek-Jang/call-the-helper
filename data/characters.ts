@@ -35,5 +35,12 @@ export const characters: Character[] = [
     image: require("../assets/images/character-firefighter.png"),
     description: "용기와 책임감을 가르쳐주는 영웅 소방관",
     voiceType: "heroic"
+  },
+  {
+    id: "mangtae",
+    name: "망태할아범",
+    image: require("../assets/images/character-mangtae.png"),
+    description: "착하지 않은 아이들을 데려간다는 무서운 망태할아범",
+    voiceType: "scary"
   }
 ];

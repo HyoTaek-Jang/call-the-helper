@@ -32,7 +32,8 @@ export default function CallSettingsScreen() {
       interval = setInterval(() => {
         setCountdown(prev => {
           if (prev === null || prev <= 1) {
-            startCall();
+            // 다음 렌더링 사이클에서 startCall 실행
+            setTimeout(() => startCall(), 0);
             return null;
           }
           return prev - 1;

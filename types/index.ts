@@ -3,7 +3,7 @@ export interface Character {
   name: string;
   image: any; // For React Native image requires
   description: string;
-  voiceType: "stern" | "gentle" | "caring" | "professional" | "heroic";
+  voiceType: "stern" | "gentle" | "caring" | "professional" | "heroic" | "scary";
 }
 
 export interface Scenario {
@@ -12,7 +12,6 @@ export interface Scenario {
   description: string;
   category: string;
   duration: string;
-  ageRange: string;
   icon?: any; // For React Native icons
   script: string;
 }
