@@ -15,6 +15,7 @@ export interface Scenario {
   duration: string;
   icon?: any; // For React Native icons
   script: string;
+  audioFile: any; // For React Native audio requires
 }
 
 export interface CallSettings {

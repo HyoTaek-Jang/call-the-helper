@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   StyleSheet, 
   View, 
@@ -11,6 +11,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, router } from 'expo-router';
+import { Audio } from 'expo-av';
 import { characters } from '../data/characters';
 
 export default function PhoneCallScreen() {
@@ -20,12 +21,58 @@ export default function PhoneCallScreen() {
   
   const [callDuration, setCallDuration] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [sound, setSound] = useState<Audio.Sound | null>(null);
+  const [audioLoaded, setAudioLoaded] = useState(false);
   
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   const character = characters.find(c => c.id === characterId);
   const scenario = character?.scenarios.find(s => s.id === scenarioId);
+
+  const handleEndCall = useCallback(async () => {
+    if (sound) {
+      await sound.stopAsync();
+      await sound.unloadAsync();
+    }
+    router.back();
+  }, [sound]);
+
+  const loadAudio = useCallback(async () => {
+    if (audioLoaded) return;
+    
+    try {
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: false,
+        staysActiveInBackground: false,
+        playsInSilentModeIOS: true,
+      });
+
+      const { sound: audioSound } = await Audio.Sound.createAsync(
+        scenario?.audioFile,
+        { shouldPlay: false }
+      );
+
+      setSound(audioSound);
+      setAudioLoaded(true);
+
+      audioSound.setOnPlaybackStatusUpdate((status) => {
+        if (status.isLoaded && status.didJustFinish) {
+          setIsPlaying(false);
+          handleEndCall();
+        }
+      });
+
+      // 오디오가 완전히 로드된 후 재생
+      const status = await audioSound.getStatusAsync();
+      if (status.isLoaded) {
+        await audioSound.playAsync();
+        setIsPlaying(true);
+      }
+    } catch (error) {
+      console.error('Error loading audio:', error);
+    }
+  }, [scenario?.audioFile, handleEndCall, audioLoaded]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -48,11 +95,16 @@ export default function PhoneCallScreen() {
     );
     pulseAnimation.start();
 
+    loadAudio();
+
     return () => {
       clearInterval(interval);
       pulseAnimation.stop();
+      if (sound) {
+        sound.unloadAsync();
+      }
     };
-  }, [pulseAnim]);
+  }, [pulseAnim, sound, loadAudio]);
 
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -60,12 +112,43 @@ export default function PhoneCallScreen() {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const handleEndCall = () => {
-    router.back();
+  const handlePlayAudio = async () => {
+    if (!sound) return;
+
+    try {
+      const status = await sound.getStatusAsync();
+      if (status.isLoaded) {
+        if (isPlaying) {
+          await sound.pauseAsync();
+          setIsPlaying(false);
+        } else {
+          if (status.positionMillis === status.durationMillis) {
+            await sound.setPositionAsync(0);
+          }
+          await sound.playAsync();
+          setIsPlaying(true);
+        }
+      }
+    } catch (error) {
+      console.error('Error controlling audio:', error);
+    }
   };
 
-  const handlePlayAudio = () => {
-    setIsPlaying(!isPlaying);
+  const handleReplayAudio = async () => {
+    if (!sound) return;
+
+    try {
+      const status = await sound.getStatusAsync();
+      if (status.isLoaded) {
+        await sound.stopAsync();
+        await sound.setPositionAsync(0);
+        await sound.playAsync();
+        setIsPlaying(true);
+        setCallDuration(0);
+      }
+    } catch (error) {
+      console.error('Error replaying audio:', error);
+    }
   };
 
   const handleButtonPress = (callback: () => void) => {
@@ -147,7 +230,7 @@ export default function PhoneCallScreen() {
             <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
               <TouchableOpacity
                 style={[styles.controlButton, styles.audioButton]}
-                onPress={() => handleButtonPress(() => {})}
+                onPress={() => handleButtonPress(handleReplayAudio)}
                 activeOpacity={0.8}
               >
                 <Ionicons name="refresh" size={28} color="white" />
