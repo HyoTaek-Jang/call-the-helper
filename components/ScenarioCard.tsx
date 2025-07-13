@@ -112,13 +112,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     marginVertical: 8,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
     elevation: 3,
     borderWidth: 1,
     borderColor: '#e0e0e0',
@@ -126,7 +120,7 @@ const styles = StyleSheet.create({
   selectedContainer: {
     borderColor: 'hsl(210, 85%, 65%)',
     backgroundColor: '#F0F8FF',
-    shadowOpacity: 0.2,
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
     borderWidth: 2,
   },
   header: {

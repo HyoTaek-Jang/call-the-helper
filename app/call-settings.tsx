@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Alert, Image, Modal, TextInput } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Alert, Modal, TextInput } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { GradientView } from '../components/ui/GradientView';
 import AppHeader from '../components/AppHeader';
 import { Gradients } from '../constants/Colors';
-import { characters } from '../data/characters';
-import { scenarios } from '../data/scenarios';
 
 const CALL_TIMING_OPTIONS = [
   { id: 'immediate', label: '즉시 전화', description: '바로 전화가 옵니다', minutes: 0, icon: 'flash' },
@@ -17,7 +15,6 @@ const CALL_TIMING_OPTIONS = [
 
 export default function CallSettingsScreen() {
   const params = useLocalSearchParams();
-  const characterId = params.characterId as string;
   const scenarioId = params.scenarioId as string;
   const scenarioTitle = params.scenarioTitle as string;
   
@@ -28,8 +25,6 @@ export default function CallSettingsScreen() {
   const [customMinutes, setCustomMinutes] = useState('');
   const [actualCustomMinutes, setActualCustomMinutes] = useState(0);
 
-  const character = characters.find(c => c.id === characterId);
-  const scenario = scenarios.find(s => s.id === scenarioId);
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
@@ -57,6 +52,11 @@ export default function CallSettingsScreen() {
     }
   };
 
+  const isValidTime = (minutes: string) => {
+    const num = parseInt(minutes);
+    return !isNaN(num) && num >= 1 && num <= 60;
+  };
+
   const handleCustomTimeConfirm = () => {
     const minutes = parseInt(customMinutes);
     if (isNaN(minutes) || minutes < 1 || minutes > 60) {
@@ -70,12 +70,10 @@ export default function CallSettingsScreen() {
   };
 
   const startCall = () => {
-    const characterId = params.characterId as string;
-    
     router.push({
       pathname: '/phone-call',
       params: {
-        characterId,
+        characterId: params.characterId as string,
         scenarioId,
       }
     });
@@ -155,18 +153,7 @@ export default function CallSettingsScreen() {
       />
       
       <View style={styles.content}>
-        {/* 캐릭터 및 시나리오 정보 섹션 */}
-        {character && scenario && (
-          <View style={styles.mainInfoSection}>
-            <Image source={character.image} style={styles.centeredCharacterImage} />
-            <View style={styles.callDescriptionContainer}>
-              <Text style={styles.characterNameText}>{character.name} 캐릭터</Text>
-              <Text style={styles.scenarioNameText}>{scenario.title} 시나리오</Text>
-            </View>
-          </View>
-        )}
-
-        <View style={styles.timingSection}>
+        <View style={[styles.timingSection]}>
           <Text style={styles.sectionTitle}>전화가 올 시간을 선택하세요</Text>
           <Text style={styles.sectionSubtitle}>선택한 시간에 가상 전화가 옵니다</Text>
           
@@ -259,16 +246,25 @@ export default function CallSettingsScreen() {
               <Text style={styles.customModalLabel}>몇 분 후에 전화가 올까요?</Text>
               <Text style={styles.customModalSubLabel}>(1분 ~ 60분)</Text>
               
-              <View style={styles.customInputContainer}>
+              <View style={[
+                styles.customInputContainer,
+                !isValidTime(customMinutes) && customMinutes !== '' && styles.customInputContainerError
+              ]}>
                 <TextInput
-                  style={styles.customInput}
+                  style={[
+                    styles.customInput,
+                    !isValidTime(customMinutes) && customMinutes !== '' && styles.customInputError
+                  ]}
                   value={customMinutes}
                   onChangeText={setCustomMinutes}
                   placeholder="분"
                   keyboardType="numeric"
                   maxLength={2}
                 />
-                <Text style={styles.customInputUnit}>분</Text>
+                <Text style={[
+                  styles.customInputUnit,
+                  !isValidTime(customMinutes) && customMinutes !== '' && styles.customInputUnitError
+                ]}>분</Text>
               </View>
             </View>
 
@@ -280,10 +276,17 @@ export default function CallSettingsScreen() {
                 <Text style={styles.customCancelButtonText}>취소</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.customConfirmButton}
+                style={[
+                  styles.customConfirmButton,
+                  (!isValidTime(customMinutes) || customMinutes === '') && styles.customConfirmButtonDisabled
+                ]}
                 onPress={handleCustomTimeConfirm}
+                disabled={!isValidTime(customMinutes) || customMinutes === ''}
               >
-                <Text style={styles.customConfirmButtonText}>확인</Text>
+                <Text style={[
+                  styles.customConfirmButtonText,
+                  (!isValidTime(customMinutes) || customMinutes === '') && styles.customConfirmButtonTextDisabled
+                ]}>확인</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -300,49 +303,6 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 20,
-  },
-  mainInfoSection: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 24,
-    marginTop: 20,
-    marginBottom: 30,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  centeredCharacterImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginBottom: 20,
-    borderWidth: 3,
-    borderColor: 'hsl(210, 85%, 65%)',
-  },
-  callDescriptionContainer: {
-    alignItems: 'center',
-    width: '100%',
-  },
-  characterNameText: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: 'hsl(210, 85%, 55%)',
-    textAlign: 'center',
-    marginBottom: 8,
-    flexWrap: 'wrap',
-  },
-  scenarioNameText: {
-    fontSize: 18,
-    fontWeight: '600', 
-    color: 'hsl(280, 85%, 55%)',
-    textAlign: 'center',
-    flexWrap: 'wrap',
   },
   timingSection: {
     flex: 1,
@@ -433,10 +393,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
+    marginBottom: 100,
   },
   waitingContent: {
     alignItems: 'center',
-    marginBottom: 60,
+    marginBottom: 30,
   },
   waitingTitle: {
     fontSize: 24,
@@ -562,5 +523,20 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  customInputContainerError: {
+    borderColor: '#dc3545',
+  },
+  customInputError: {
+    color: '#dc3545',
+  },
+  customInputUnitError: {
+    color: '#dc3545',
+  },
+  customConfirmButtonDisabled: {
+    backgroundColor: '#e0e0e0',
+  },
+  customConfirmButtonTextDisabled: {
+    color: '#999999',
   },
 });
