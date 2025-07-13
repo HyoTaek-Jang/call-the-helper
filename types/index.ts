@@ -13,7 +13,6 @@ export interface Scenario {
   description: string;
   category: string;
   duration: string;
-  ageRange: string;
   icon?: any; // For React Native icons
   script: string;
 }

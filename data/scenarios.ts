@@ -7,7 +7,6 @@ export const scenarios: Scenario[] = [
     description: "아이가 양치를 거부할 때 도움을 주는 시나리오",
     category: "건강관리",
     duration: "30초",
-    ageRange: "3-8세",
     script: "안녕하세요! 양치는 건강한 치아를 위해 꼭 필요해요. 지금 양치를 하면 충치균들이 모두 사라질 거예요!"
   },
   {
@@ -16,7 +15,6 @@ export const scenarios: Scenario[] = [
     description: "아이가 잠자리에 가기 싫어할 때 사용하는 시나리오",
     category: "수면관리",
     duration: "45초",
-    ageRange: "3-10세",
     script: "이제 잠잘 시간이에요. 충분한 잠을 자야 내일 더 건강하고 똑똑해질 수 있답니다. 빨리 잠자리로 가볼까요?"
   },
   {
@@ -25,7 +23,6 @@ export const scenarios: Scenario[] = [
     description: "편식하는 아이에게 야채의 중요성을 알려주는 시나리오",
     category: "식사예절",
     duration: "40초",
-    ageRange: "3-12세",
     script: "야채는 우리 몸을 튼튼하게 만들어주는 마법의 음식이에요. 야채를 먹으면 더 키가 크고 힘이 세질 거예요!"
   },
   {
@@ -34,7 +31,6 @@ export const scenarios: Scenario[] = [
     description: "아이가 정리정돈을 하지 않을 때 도움을 주는 시나리오",
     category: "생활습관",
     duration: "35초",
-    ageRange: "4-10세",
     script: "정리정돈된 방에서는 더 편안하고 행복하게 지낼 수 있어요. 지금 함께 정리를 시작해볼까요?"
   },
   {
@@ -43,7 +39,6 @@ export const scenarios: Scenario[] = [
     description: "아이가 외출을 준비하지 않을 때 사용하는 시나리오",
     category: "일상생활",
     duration: "30초",
-    ageRange: "3-8세",
     script: "외출할 때는 준비를 잘 해야 해요. 신발도 신고, 가방도 챙기고, 준비가 끝나면 즐거운 시간을 보낼 수 있어요!"
   }
 ];
