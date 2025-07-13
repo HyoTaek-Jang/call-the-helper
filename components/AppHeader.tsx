@@ -27,7 +27,7 @@ export default function AppHeader({
   };
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView style={styles.container} lightColor="transparent">
       <View style={styles.topRow}>
         {showBackButton ? (
           <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>

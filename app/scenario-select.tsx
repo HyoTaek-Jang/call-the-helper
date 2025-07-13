@@ -1,11 +1,13 @@
 import { StyleSheet } from 'react-native';
 import { ThemedText } from '../components/ui/ThemedText';
 import { ThemedView } from '../components/ui/ThemedView';
+import { GradientView } from '../components/ui/GradientView';
 import AppHeader from '../components/AppHeader';
+import { Gradients } from '../constants/Colors';
 
 export default function ScenarioSelectScreen() {
   return (
-    <ThemedView style={styles.container}>
+    <GradientView colors={Gradients.background} style={styles.container}>
       <AppHeader 
         title="시나리오 선택" 
         currentStep={2} 
@@ -14,7 +16,7 @@ export default function ScenarioSelectScreen() {
       <ThemedView style={styles.content} lightColor="transparent">
         <ThemedText>시나리오 선택 화면입니다.</ThemedText>
       </ThemedView>
-    </ThemedView>
+    </GradientView>
   );
 }
 

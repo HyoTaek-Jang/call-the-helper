@@ -1,11 +1,13 @@
 import { StyleSheet } from 'react-native';
 import { ThemedText } from '../components/ui/ThemedText';
 import { ThemedView } from '../components/ui/ThemedView';
+import { GradientView } from '../components/ui/GradientView';
 import AppHeader from '../components/AppHeader';
+import { Gradients } from '../constants/Colors';
 
 export default function CallSettingsScreen() {
   return (
-    <ThemedView style={styles.container}>
+    <GradientView colors={Gradients.background} style={styles.container}>
       <AppHeader 
         title="전화 설정" 
         currentStep={3} 
@@ -14,7 +16,7 @@ export default function CallSettingsScreen() {
       <ThemedView style={styles.content} lightColor="transparent">
         <ThemedText>전화 설정 화면입니다.</ThemedText>
       </ThemedView>
-    </ThemedView>
+    </GradientView>
   );
 }
 

@@ -2,10 +2,12 @@ import { StyleSheet, TouchableOpacity } from 'react-native';
 import { Link } from 'expo-router';
 import { ThemedText } from '../components/ui/ThemedText';
 import { ThemedView } from '../components/ui/ThemedView';
+import { GradientView } from '../components/ui/GradientView';
+import { Gradients } from '../constants/Colors';
 
 export default function HomeScreen() {
   return (
-    <ThemedView style={styles.container}>
+    <GradientView colors={Gradients.background} style={styles.container}>
       <ThemedText type="title" style={styles.title}>
         헬퍼 전화
       </ThemedText>
@@ -21,7 +23,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </Link>
       </ThemedView>
-    </ThemedView>
+    </GradientView>
   );
 }
 

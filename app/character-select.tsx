@@ -3,8 +3,10 @@ import { StyleSheet, ScrollView, View, Text, TouchableOpacity } from 'react-nati
 import { router } from 'expo-router';
 import { CharacterCard } from '../components/CharacterCard';
 import { ThemedView } from '../components/ui/ThemedView';
+import { GradientView } from '../components/ui/GradientView';
 import AppHeader from '../components/AppHeader';
 import { characters } from '../data/characters';
+import { Gradients } from '../constants/Colors';
 import { Character } from '../types';
 
 export default function CharacterSelectScreen() {
@@ -34,7 +36,7 @@ export default function CharacterSelectScreen() {
   };
 
   return (
-    <ThemedView style={styles.container}>
+    <GradientView colors={Gradients.background} style={styles.container}>
       <AppHeader 
         title="캐릭터 선택" 
         currentStep={1} 
@@ -103,7 +105,7 @@ export default function CharacterSelectScreen() {
           </TouchableOpacity>
         </View>
       )}
-    </ThemedView>
+    </GradientView>
   );
 }
 

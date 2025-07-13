@@ -33,3 +33,9 @@ export const Colors = {
     danger: '#FF3B30',
   },
 };
+
+export const Gradients = {
+  background: ['#ffffffff', '#ffffffff', '#ffffffff'],
+  primaryBlue: ['hsl(210, 85%, 70%)', 'hsl(210, 85%, 60%)', 'hsl(210, 85%, 65%)'],
+  subtle: ['#ffffff', '#f8f9fa', '#ffffff'],
+};
