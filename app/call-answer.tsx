@@ -68,14 +68,7 @@ export default function CallAnswerScreen() {
   };
 
   const handleDecline = () => {
-    router.push({
-      pathname: '/call-settings',
-      params: { 
-        characterId, 
-        scenarioId,
-        scenarioTitle: scenario?.title
-      }
-    });
+    router.back()
   };
 
   if (!character || !scenario) {

@@ -115,6 +115,7 @@ export default function CallSettingsScreen() {
   const handleCancelWaiting = () => {
     setIsWaiting(false);
     setCountdown(null);
+    router.back();
   };
 
   const formatTime = useCallback((seconds: number) => {
