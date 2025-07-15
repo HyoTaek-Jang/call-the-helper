@@ -7,6 +7,7 @@ export const characters: Character[] = [
     image: require("../assets/images/character-police.png"),
     description: "안전과 규칙의 중요성을 알려주는 친근한 경찰관",
     voiceType: "stern",
+    previewAudio: require("../assets/audios/police-preview.mp3"),
     scenarios: [
       {
         id: "cleaning-room",
@@ -25,6 +26,7 @@ export const characters: Character[] = [
     image: require("../assets/images/character-teacher.png"),
     description: "배움과 성장을 도와주는 따뜻한 선생님",
     voiceType: "gentle",
+    previewAudio: require("../assets/audios/teacher-preview.mp3"),
     scenarios: [
       {
         id: "eating-vegetables",
@@ -43,6 +45,7 @@ export const characters: Character[] = [
     image: require("../assets/images/character-grandma.png"),
     description: "사랑과 지혜를 전해주는 따뜻한 할머니",
     voiceType: "caring",
+    previewAudio: require("../assets/audios/grandma-preview.mp3"),
     scenarios: [
       {
         id: "bedtime",
@@ -61,6 +64,7 @@ export const characters: Character[] = [
     image: require("../assets/images/character-doctor.png"),
     description: "건강과 생활습관을 지도하는 믿음직한 의사",
     voiceType: "professional",
+    previewAudio: require("../assets/audios/doctor-preview.mp3"),
     scenarios: [
       {
         id: "brushing-teeth",
@@ -79,6 +83,7 @@ export const characters: Character[] = [
     image: require("../assets/images/character-firefighter.png"),
     description: "용기와 책임감을 가르쳐주는 영웅 소방관",
     voiceType: "heroic",
+    previewAudio: require("../assets/audios/firefighter-preview.mp3"),
     scenarios: [
       {
         id: "going-out",
@@ -97,6 +102,7 @@ export const characters: Character[] = [
     image: require("../assets/images/character-mangtae.png"),
     description: "말 안 듣는 아이들을 교육하는 전통적인 할아범",
     voiceType: "stern",
+    previewAudio: require("../assets/audios/mangtae-preview.mp3"),
     scenarios: [
       {
         id: "general-discipline",

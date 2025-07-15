@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { Audio } from 'expo-av';
 import { Character } from '../types';
 
 interface CharacterCardProps {
@@ -13,6 +14,38 @@ export const CharacterCard = ({
   isSelected = false, 
   onPress 
 }: CharacterCardProps) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [sound, setSound] = useState<Audio.Sound | null>(null);
+
+  const playPreview = async () => {
+    try {
+      if (isPlaying && sound) {
+        await sound.stopAsync();
+        setIsPlaying(false);
+        return;
+      }
+
+      const { sound: newSound } = await Audio.Sound.createAsync(
+        character.previewAudio,
+        { shouldPlay: true }
+      );
+      
+      setSound(newSound);
+      setIsPlaying(true);
+
+      newSound.setOnPlaybackStatusUpdate((status) => {
+        if (status.isLoaded && status.didJustFinish) {
+          setIsPlaying(false);
+          newSound.unloadAsync();
+          setSound(null);
+        }
+      });
+    } catch (error) {
+      console.error('Error playing audio:', error);
+      setIsPlaying(false);
+    }
+  };
+
   return (
     <TouchableOpacity 
       style={[
@@ -40,6 +73,16 @@ export const CharacterCard = ({
       <Text style={styles.name}>{character.name}</Text>
       <Text style={styles.description}>{character.description}</Text>
       <Text style={styles.scenarioCount}>{character.scenarios.length}개 시나리오</Text>
+      
+      <TouchableOpacity 
+        style={styles.previewButton}
+        onPress={playPreview}
+        activeOpacity={0.7}
+      >
+        <Text style={styles.previewButtonText}>
+          {isPlaying ? '⏸️ 정지' : '🔊 미리듣기'}
+        </Text>
+      </TouchableOpacity>
     </TouchableOpacity>
   );
 };
@@ -109,6 +152,23 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: 'hsl(210, 85%, 65%)',
     textAlign: 'center',
+    fontWeight: '500',
+    marginBottom: 8,
+  },
+  previewButton: {
+    backgroundColor: '#f8f9fa',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 4,
+  },
+  previewButtonText: {
+    fontSize: 11,
+    color: '#495057',
     fontWeight: '500',
   },
 });

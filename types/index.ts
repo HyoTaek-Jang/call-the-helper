@@ -4,6 +4,7 @@ export interface Character {
   image: any; // For React Native image requires
   description: string;
   voiceType: "stern" | "gentle" | "caring" | "professional" | "heroic";
+  previewAudio: any; // For React Native audio requires
   scenarios: Scenario[];
 }
 
