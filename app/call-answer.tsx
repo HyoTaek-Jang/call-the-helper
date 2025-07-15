@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -8,6 +8,7 @@ import {
   Animated,
   StatusBar
 } from 'react-native';
+import { Audio } from 'expo-av';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, router } from 'expo-router';
@@ -20,11 +21,12 @@ export default function CallAnswerScreen() {
   
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
+  const [sound, setSound] = useState<Audio.Sound | null>(null);
 
   const character = characters.find(c => c.id === characterId);
   const scenario = character?.scenarios.find(s => s.id === scenarioId);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const pulseAnimation = Animated.loop(
       Animated.sequence([
         Animated.timing(pulseAnim, {
@@ -44,6 +46,44 @@ export default function CallAnswerScreen() {
     return () => pulseAnimation.stop();
   }, [pulseAnim]);
 
+  useEffect(() => {
+    let ringtoneSound: Audio.Sound | null = null;
+
+    const playRingtone = async () => {
+      try {
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: false,
+          staysActiveInBackground: true,
+          playsInSilentModeIOS: true,
+          shouldDuckAndroid: true,
+          playThroughEarpieceAndroid: false,
+        });
+
+        const { sound: newSound } = await Audio.Sound.createAsync(
+          require('../assets/audios/ringtone.mp3'),
+          { 
+            shouldPlay: true,
+            isLooping: true,
+            volume: 1.0
+          }
+        );
+        
+        ringtoneSound = newSound;
+        setSound(newSound);
+      } catch (error) {
+        console.log('Error playing ringtone:', error);
+      }
+    };
+
+    playRingtone();
+
+    return () => {
+      if (ringtoneSound) {
+        ringtoneSound.unloadAsync();
+      }
+    };
+  }, []);
+
   const handleButtonPress = (callback: () => void) => {
     Animated.sequence([
       Animated.timing(scaleAnim, {
@@ -60,15 +100,21 @@ export default function CallAnswerScreen() {
     callback();
   };
 
-  const handleAccept = () => {
+  const handleAccept = async () => {
+    if (sound) {
+      await sound.unloadAsync();
+    }
     router.push({
       pathname: '/phone-call',
       params: { characterId, scenarioId }
     });
   };
 
-  const handleDecline = () => {
-    router.replace("/")
+  const handleDecline = async () => {
+    if (sound) {
+      await sound.unloadAsync();
+    }
+    router.replace("/");
   };
 
   if (!character || !scenario) {
