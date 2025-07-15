@@ -68,7 +68,7 @@ export default function CallAnswerScreen() {
   };
 
   const handleDecline = () => {
-    router.back()
+    router.replace("/")
   };
 
   if (!character || !scenario) {

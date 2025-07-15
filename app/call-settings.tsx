@@ -20,8 +20,6 @@ export default function CallSettingsScreen() {
   const scenarioTitle = params.scenarioTitle as string;
   
   const [selectedTiming, setSelectedTiming] = useState<string | null>(null);
-  const [countdown, setCountdown] = useState<number | null>(null);
-  const [isWaiting, setIsWaiting] = useState(false);
   const [customModalVisible, setCustomModalVisible] = useState(false);
   const [customMinutes, setCustomMinutes] = useState('');
   const [customSeconds, setCustomSeconds] = useState('');
@@ -37,24 +35,6 @@ export default function CallSettingsScreen() {
     });
   }, [params.characterId, scenarioId]);
 
-  useEffect(() => {
-    let interval: ReturnType<typeof setInterval>;
-    if (countdown !== null && countdown > 0) {
-      interval = setInterval(() => {
-        setCountdown(prev => {
-          if (prev === null || prev <= 1) {
-            // Navigation을 다음 tick으로 지연시켜 setState와 분리
-            setTimeout(() => startCall(), 0);
-            return null;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [countdown, startCall]);
 
   const handleTimingSelect = (timingId: string) => {
     if (timingId === 'custom') {
@@ -107,16 +87,18 @@ export default function CallSettingsScreen() {
     if (secondsToWait === 0) {
       startCall();
     } else {
-      setIsWaiting(true);
-      setCountdown(secondsToWait);
+      router.push({
+        pathname: '/call-waiting',
+        params: {
+          characterId: params.characterId as string,
+          scenarioId,
+          scenarioTitle,
+          waitTime: secondsToWait.toString()
+        }
+      });
     }
   };
 
-  const handleCancelWaiting = () => {
-    setIsWaiting(false);
-    setCountdown(null);
-    router.back();
-  };
 
   const formatTime = useCallback((seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -134,35 +116,6 @@ export default function CallSettingsScreen() {
     return null;
   }, [selectedTiming, actualCustomSeconds, formatTime]);
 
-  if (isWaiting && countdown !== null) {
-    return (
-      <GradientView colors={Gradients.background} style={styles.container}>
-        <AppHeader 
-          title="전화 대기 중" 
-          currentStep={3} 
-          totalSteps={3}
-          showBackButton={false}
-        />
-        <View style={styles.waitingContainer}>
-          <View style={styles.waitingContent}>
-            <Ionicons name="call-outline" size={60} color="hsl(210, 85%, 65%)" />
-            <Text style={styles.waitingTitle}>전화 대기 중...</Text>
-            <Text style={styles.countdownText}>{formatTime(countdown)}</Text>
-            <Text style={styles.waitingSubtitle}>
-              {scenarioTitle} 시나리오로 곧 전화가 올 예정입니다
-            </Text>
-          </View>
-          <TouchableOpacity
-            style={styles.cancelButton}
-            onPress={handleCancelWaiting}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.cancelButtonText}>취소</Text>
-          </TouchableOpacity>
-        </View>
-      </GradientView>
-    );
-  }
 
   return (
     <GradientView colors={Gradients.background} style={styles.container}>
@@ -430,50 +383,6 @@ const styles = StyleSheet.create({
   },
   startButtonTextDisabled: {
     color: '#999999',
-  },
-  waitingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    marginBottom: 100,
-  },
-  waitingContent: {
-    alignItems: 'center',
-    marginBottom: 30,
-  },
-  waitingTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#333333',
-    marginTop: 20,
-    marginBottom: 16,
-  },
-  countdownText: {
-    fontSize: 48,
-    fontWeight: '300',
-    color: 'hsl(210, 85%, 65%)',
-    marginBottom: 16,
-    fontFamily: 'monospace',
-  },
-  waitingSubtitle: {
-    fontSize: 16,
-    color: '#666666',
-    textAlign: 'center',
-    lineHeight: 24,
-  },
-  cancelButton: {
-    backgroundColor: '#ffffff',
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-  },
-  cancelButtonText: {
-    color: '#666666',
-    fontSize: 16,
-    fontWeight: '500',
   },
   modalOverlay: {
     flex: 1,

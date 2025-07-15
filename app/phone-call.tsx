@@ -35,7 +35,7 @@ export default function PhoneCallScreen() {
       await sound.stopAsync();
       await sound.unloadAsync();
     }
-    router.push('/');
+    router.replace('/');
   }, [sound]);
 
   const loadAudio = useCallback(async () => {
