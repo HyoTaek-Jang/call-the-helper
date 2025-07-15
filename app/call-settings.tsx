@@ -29,7 +29,7 @@ export default function CallSettingsScreen() {
 
   const startCall = useCallback(() => {
     router.push({
-      pathname: '/phone-call',
+      pathname: '/call-answer',
       params: {
         characterId: params.characterId as string,
         scenarioId,
