@@ -24,10 +24,10 @@ export const CharacterCard = ({
         setIsPlaying(false);
         return;
       }
-
+      
       const { sound: newSound } = await Audio.Sound.createAsync(
         character.previewAudio,
-        { shouldPlay: true }
+        { shouldPlay: true, volume: 1.0 }
       );
       
       setSound(newSound);
