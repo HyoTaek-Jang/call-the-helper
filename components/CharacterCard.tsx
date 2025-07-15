@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Audio } from 'expo-av';
 import { Character } from '../types';
@@ -7,37 +7,60 @@ interface CharacterCardProps {
   character: Character;
   isSelected?: boolean;
   onPress: () => void;
+  currentSoundRef: React.MutableRefObject<Audio.Sound | null>;
+  stopCurrentAudio: () => Promise<void>;
 }
 
 export const CharacterCard = ({ 
   character, 
   isSelected = false, 
-  onPress 
+  onPress,
+  currentSoundRef,
+  stopCurrentAudio 
 }: CharacterCardProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [sound, setSound] = useState<Audio.Sound | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (currentSoundRef.current) {
+        currentSoundRef.current.unloadAsync();
+      }
+    };
+  }, [currentSoundRef]);
 
   const playPreview = async () => {
     try {
-      if (isPlaying && sound) {
-        await sound.stopAsync();
+      if (isPlaying && currentSoundRef.current) {
+        await stopCurrentAudio();
         setIsPlaying(false);
         return;
       }
+
+      // Stop any currently playing sound
+      await stopCurrentAudio();
+
+      // Configure audio mode for mobile playback
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: false,
+        staysActiveInBackground: false,
+        playsInSilentModeIOS: true,
+        shouldDuckAndroid: true,
+        playThroughEarpieceAndroid: false,
+      });
       
       const { sound: newSound } = await Audio.Sound.createAsync(
         character.previewAudio,
         { shouldPlay: true, volume: 1.0 }
       );
       
-      setSound(newSound);
+      currentSoundRef.current = newSound;
       setIsPlaying(true);
 
       newSound.setOnPlaybackStatusUpdate((status) => {
         if (status.isLoaded && status.didJustFinish) {
           setIsPlaying(false);
           newSound.unloadAsync();
-          setSound(null);
+          currentSoundRef.current = null;
         }
       });
     } catch (error) {
