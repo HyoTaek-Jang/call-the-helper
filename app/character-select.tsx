@@ -21,9 +21,7 @@ export default function CharacterSelectScreen() {
   const voiceTypeLabels = {
     stern: '엄격한',
     gentle: '부드러운', 
-    caring: '자상한',
     professional: '전문적인',
-    heroic: '영웅적인'
   };
 
   const handleCharacterSelect = (character: Character) => {
