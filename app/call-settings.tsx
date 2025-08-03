@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Alert, Modal, TextInput } from 'react-native';
+import React, { useState, useCallback, useMemo } from 'react';
+import { StyleSheet, View, Text, TouchableOpacity, Alert, Modal, TextInput, Platform } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { GradientView } from '../components/ui/GradientView';
@@ -7,10 +7,11 @@ import AppHeader from '../components/AppHeader';
 import { Gradients } from '../constants/Colors';
 
 const CALL_TIMING_OPTIONS = [
-  { id: 'immediate', label: '즉시 전화', description: '바로 전화가 옵니다', minutes: 0, icon: 'flash' },
-  { id: '1min', label: '1분 후', description: '1분 후에 전화가 옵니다', minutes: 1, icon: 'time' },
-  { id: '3min', label: '3분 후', description: '3분 후에 전화가 옵니다', minutes: 3, icon: 'timer' },
-  { id: 'custom', label: '사용자 설정', description: '원하는 시간을 직접 설정', minutes: 0, icon: 'settings' },
+  { id: 'immediate', label: '즉시 전화', description: '바로 전화가 옵니다', seconds: 0, icon: 'flash' },
+  { id: '30sec', label: '30초 후', description: '30초 후에 전화가 옵니다', seconds: 30, icon: 'stopwatch' },
+  { id: '1min', label: '1분 후', description: '1분 후에 전화가 옵니다', seconds: 60, icon: 'time' },
+  { id: '3min', label: '3분 후', description: '3분 후에 전화가 옵니다', seconds: 180, icon: 'timer' },
+  { id: 'custom', label: '사용자 설정', description: '원하는 시간을 직접 설정', seconds: 0, icon: 'settings' },
 ];
 
 export default function CallSettingsScreen() {
@@ -19,31 +20,21 @@ export default function CallSettingsScreen() {
   const scenarioTitle = params.scenarioTitle as string;
   
   const [selectedTiming, setSelectedTiming] = useState<string | null>(null);
-  const [countdown, setCountdown] = useState<number | null>(null);
-  const [isWaiting, setIsWaiting] = useState(false);
   const [customModalVisible, setCustomModalVisible] = useState(false);
   const [customMinutes, setCustomMinutes] = useState('');
-  const [actualCustomMinutes, setActualCustomMinutes] = useState(0);
+  const [customSeconds, setCustomSeconds] = useState('');
+  const [actualCustomSeconds, setActualCustomSeconds] = useState(0);
 
+  const startCall = useCallback(() => {
+    router.push({
+      pathname: '/call-answer',
+      params: {
+        characterId: params.characterId as string,
+        scenarioId,
+      }
+    });
+  }, [params.characterId, scenarioId]);
 
-  useEffect(() => {
-    let interval: ReturnType<typeof setInterval>;
-    if (countdown !== null && countdown > 0) {
-      interval = setInterval(() => {
-        setCountdown(prev => {
-          if (prev === null || prev <= 1) {
-            // 다음 렌더링 사이클에서 startCall 실행
-            setTimeout(() => startCall(), 0);
-            return null;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [countdown]);
 
   const handleTimingSelect = (timingId: string) => {
     if (timingId === 'custom') {
@@ -53,31 +44,28 @@ export default function CallSettingsScreen() {
     }
   };
 
-  const isValidTime = (minutes: string) => {
-    const num = parseInt(minutes);
-    return !isNaN(num) && num >= 1 && num <= 60;
+  const isValidTime = (minutes: string, seconds: string) => {
+    const mins = parseInt(minutes) || 0;
+    const secs = parseInt(seconds) || 0;
+    const totalSeconds = mins * 60 + secs;
+    return totalSeconds >= 1 && totalSeconds <= 3600; // 1초 ~ 1시간
   };
 
   const handleCustomTimeConfirm = () => {
-    const minutes = parseInt(customMinutes);
-    if (isNaN(minutes) || minutes < 1 || minutes > 60) {
-      Alert.alert('오류', '1분부터 60분까지 입력해주세요.');
+    const minutes = parseInt(customMinutes) || 0;
+    const seconds = parseInt(customSeconds) || 0;
+    const totalSeconds = minutes * 60 + seconds;
+    
+    if (totalSeconds < 1 || totalSeconds > 3600) {
+      Alert.alert('오류', '1초부터 60분까지 입력해주세요.');
       return;
     }
-    setActualCustomMinutes(minutes);
+    
+    setActualCustomSeconds(totalSeconds);
     setSelectedTiming('custom');
     setCustomModalVisible(false);
     setCustomMinutes('');
-  };
-
-  const startCall = () => {
-    router.push({
-      pathname: '/phone-call',
-      params: {
-        characterId: params.characterId as string,
-        scenarioId,
-      }
-    });
+    setCustomSeconds('');
   };
 
   const handleStartCall = () => {
@@ -86,64 +74,48 @@ export default function CallSettingsScreen() {
       return;
     }
 
-    let minutesToWait = 0;
+    let secondsToWait = 0;
     
     if (selectedTiming === 'custom') {
-      minutesToWait = actualCustomMinutes;
+      secondsToWait = actualCustomSeconds;
     } else {
       const selectedOption = CALL_TIMING_OPTIONS.find(option => option.id === selectedTiming);
       if (!selectedOption) return;
-      minutesToWait = selectedOption.minutes;
+      secondsToWait = selectedOption.seconds;
     }
 
-    if (minutesToWait === 0) {
+    if (secondsToWait === 0) {
       startCall();
     } else {
-      setIsWaiting(true);
-      setCountdown(minutesToWait * 60);
+      router.push({
+        pathname: '/call-waiting',
+        params: {
+          characterId: params.characterId as string,
+          scenarioId,
+          scenarioTitle,
+          waitTime: secondsToWait.toString()
+        }
+      });
     }
   };
 
-  const handleCancelWaiting = () => {
-    setIsWaiting(false);
-    setCountdown(null);
-  };
 
-  const formatTime = (seconds: number) => {
+  const formatTime = useCallback((seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
+  }, []);
 
-  if (isWaiting && countdown !== null) {
-    return (
-      <GradientView colors={Gradients.background} style={styles.container}>
-        <AppHeader 
-          title="전화 대기 중" 
-          currentStep={3} 
-          totalSteps={3}
-          showBackButton={false}
-        />
-        <View style={styles.waitingContainer}>
-          <View style={styles.waitingContent}>
-            <Ionicons name="call-outline" size={60} color="hsl(210, 85%, 65%)" />
-            <Text style={styles.waitingTitle}>전화 대기 중...</Text>
-            <Text style={styles.countdownText}>{formatTime(countdown)}</Text>
-            <Text style={styles.waitingSubtitle}>
-              {scenarioTitle} 시나리오로 곧 전화가 올 예정입니다
-            </Text>
-          </View>
-          <TouchableOpacity
-            style={styles.cancelButton}
-            onPress={handleCancelWaiting}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.cancelButtonText}>취소</Text>
-          </TouchableOpacity>
-        </View>
-      </GradientView>
-    );
-  }
+  const customTimingDisplay = useMemo(() => {
+    if (selectedTiming === 'custom' && actualCustomSeconds > 0) {
+      return {
+        label: `${formatTime(actualCustomSeconds)} 후`,
+        description: `${formatTime(actualCustomSeconds)} 후에 전화가 옵니다`
+      };
+    }
+    return null;
+  }, [selectedTiming, actualCustomSeconds, formatTime]);
+
 
   return (
     <GradientView colors={Gradients.background} style={styles.container}>
@@ -181,16 +153,16 @@ export default function CallSettingsScreen() {
                         styles.timingOptionLabel,
                         selectedTiming === option.id && styles.timingOptionLabelSelected
                       ]}>
-                        {option.id === 'custom' && selectedTiming === 'custom' 
-                          ? `${actualCustomMinutes}분 후` 
+                        {option.id === 'custom' && customTimingDisplay 
+                          ? customTimingDisplay.label 
                           : option.label}
                       </Text>
                       <Text style={[
                         styles.timingOptionDescription,
                         selectedTiming === option.id && styles.timingOptionDescriptionSelected
                       ]}>
-                        {option.id === 'custom' && selectedTiming === 'custom' 
-                          ? `${actualCustomMinutes}분 후에 전화가 옵니다` 
+                        {option.id === 'custom' && customTimingDisplay 
+                          ? customTimingDisplay.description 
                           : option.description}
                       </Text>
                     </View>
@@ -244,28 +216,51 @@ export default function CallSettingsScreen() {
             </View>
             
             <View style={styles.customModalBody}>
-              <Text style={styles.customModalLabel}>몇 분 후에 전화가 올까요?</Text>
-              <Text style={styles.customModalSubLabel}>(1분 ~ 60분)</Text>
+              <Text style={styles.customModalLabel}>언제 전화가 올까요?</Text>
+              <Text style={styles.customModalSubLabel}>(1초 ~ 60분)</Text>
               
-              <View style={[
-                styles.customInputContainer,
-                !isValidTime(customMinutes) && customMinutes !== '' && styles.customInputContainerError
-              ]}>
-                <TextInput
-                  style={[
-                    styles.customInput,
-                    !isValidTime(customMinutes) && customMinutes !== '' && styles.customInputError
-                  ]}
-                  value={customMinutes}
-                  onChangeText={setCustomMinutes}
-                  placeholder=""
-                  keyboardType="numeric"
-                  maxLength={2}
-                />
-                <Text style={[
-                  styles.customInputUnit,
-                  !isValidTime(customMinutes) && customMinutes !== '' && styles.customInputUnitError
-                ]}>분</Text>
+              <View style={styles.timeInputsContainer}>
+                <View style={[
+                  styles.customInputContainer,
+                  !isValidTime(customMinutes, customSeconds) && (customMinutes !== '' || customSeconds !== '') && styles.customInputContainerError
+                ]}>
+                  <TextInput
+                    style={[
+                      styles.customInput,
+                      !isValidTime(customMinutes, customSeconds) && (customMinutes !== '' || customSeconds !== '') && styles.customInputError
+                    ]}
+                    value={customMinutes}
+                    onChangeText={setCustomMinutes}
+                    placeholder="0"
+                    keyboardType="numeric"
+                    maxLength={2}
+                  />
+                  <Text style={[
+                    styles.customInputUnit,
+                    !isValidTime(customMinutes, customSeconds) && (customMinutes !== '' || customSeconds !== '') && styles.customInputUnitError
+                  ]}>분</Text>
+                </View>
+                
+                <View style={[
+                  styles.customInputContainer,
+                  !isValidTime(customMinutes, customSeconds) && (customMinutes !== '' || customSeconds !== '') && styles.customInputContainerError
+                ]}>
+                  <TextInput
+                    style={[
+                      styles.customInput,
+                      !isValidTime(customMinutes, customSeconds) && (customMinutes !== '' || customSeconds !== '') && styles.customInputError
+                    ]}
+                    value={customSeconds}
+                    onChangeText={setCustomSeconds}
+                    placeholder="0"
+                    keyboardType="numeric"
+                    maxLength={2}
+                  />
+                  <Text style={[
+                    styles.customInputUnit,
+                    !isValidTime(customMinutes, customSeconds) && (customMinutes !== '' || customSeconds !== '') && styles.customInputUnitError
+                  ]}>초</Text>
+                </View>
               </View>
             </View>
 
@@ -279,14 +274,14 @@ export default function CallSettingsScreen() {
               <TouchableOpacity
                 style={[
                   styles.customConfirmButton,
-                  (!isValidTime(customMinutes) || customMinutes === '') && styles.customConfirmButtonDisabled
+                  !isValidTime(customMinutes, customSeconds) && styles.customConfirmButtonDisabled
                 ]}
                 onPress={handleCustomTimeConfirm}
-                disabled={!isValidTime(customMinutes) || customMinutes === ''}
+                disabled={!isValidTime(customMinutes, customSeconds)}
               >
                 <Text style={[
                   styles.customConfirmButtonText,
-                  (!isValidTime(customMinutes) || customMinutes === '') && styles.customConfirmButtonTextDisabled
+                  !isValidTime(customMinutes, customSeconds) && styles.customConfirmButtonTextDisabled
                 ]}>확인</Text>
               </TouchableOpacity>
             </View>
@@ -389,50 +384,6 @@ const styles = StyleSheet.create({
   startButtonTextDisabled: {
     color: '#999999',
   },
-  waitingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    marginBottom: 100,
-  },
-  waitingContent: {
-    alignItems: 'center',
-    marginBottom: 30,
-  },
-  waitingTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#333333',
-    marginTop: 20,
-    marginBottom: 16,
-  },
-  countdownText: {
-    fontSize: 48,
-    fontWeight: '300',
-    color: 'hsl(210, 85%, 65%)',
-    marginBottom: 16,
-    fontFamily: 'monospace',
-  },
-  waitingSubtitle: {
-    fontSize: 16,
-    color: '#666666',
-    textAlign: 'center',
-    lineHeight: 24,
-  },
-  cancelButton: {
-    backgroundColor: '#ffffff',
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-  },
-  cancelButtonText: {
-    color: '#666666',
-    fontSize: 16,
-    fontWeight: '500',
-  },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -445,7 +396,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     width: '90%',
-    maxWidth: 350,
+    maxWidth: 380,
+    minWidth: 320,
   },
   customModalHeader: {
     flexDirection: 'row',
@@ -477,25 +429,43 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
   },
+  timeInputsContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    maxWidth: '100%',
+  },
   customInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 2,
     borderColor: 'hsl(210, 85%, 65%)',
     borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    flex: 1,
+    maxWidth: 100,
+    minWidth: 80,
   },
   customInput: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#333333',
     textAlign: 'center',
-    minWidth: 40,
-    marginRight: 8,
+    flex: 1,
+    marginRight: 6,
+    minWidth: 30,
+    borderWidth: 0,
+    ...(Platform.OS === 'web' && {
+      outlineStyle: 'none',
+      outlineWidth: 0,
+    }),
   },
   customInputUnit: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#666666',
+    flexShrink: 0,
   },
   customModalButtons: {
     flexDirection: 'row',

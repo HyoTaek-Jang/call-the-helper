@@ -9,6 +9,8 @@ export default function RootLayout() {
       <Stack
         screenOptions={{
           headerShown: false,
+          gestureEnabled: false,
+          headerBackVisible: false,
         }}
       >
         <Stack.Screen name="index" />
@@ -20,7 +22,9 @@ export default function RootLayout() {
           options={{ 
             title: "",
             headerShown: false,
-            presentation: 'fullScreenModal'
+            presentation: 'fullScreenModal',
+            gestureEnabled: false,
+            headerBackVisible: false
           }} 
         />
       </Stack>

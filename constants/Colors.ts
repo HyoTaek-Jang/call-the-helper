@@ -36,6 +36,7 @@ export const Colors = {
 
 export const Gradients = {
   background: ['#ffffffff', '#ffffffff', '#ffffffff'],
+  skyBlue: ['#ffffffff', '#eefcfcc4'],
   primaryBlue: ['hsl(210, 85%, 70%)', 'hsl(210, 85%, 60%)', 'hsl(210, 85%, 65%)'],
   subtle: ['#ffffff', '#f8f9fa', '#ffffff'],
 };

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { StyleSheet, ScrollView, View, Text, TouchableOpacity } from 'react-native';
 import { router } from 'expo-router';
+import { Audio } from 'expo-av';
 import { CharacterCard } from '../components/CharacterCard';
 import { GradientView } from '../components/ui/GradientView';
 import AppHeader from '../components/AppHeader';
@@ -11,6 +12,7 @@ import { Character } from '../types';
 export default function CharacterSelectScreen() {
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null);
   const [filterVoiceType, setFilterVoiceType] = useState<string | null>(null);
+  const currentSoundRef = useRef<Audio.Sound | null>(null);
 
   const filteredCharacters = filterVoiceType 
     ? characters.filter(char => char.voiceType === filterVoiceType)
@@ -19,17 +21,28 @@ export default function CharacterSelectScreen() {
   const voiceTypeLabels = {
     stern: '엄격한',
     gentle: '부드러운', 
-    caring: '자상한',
     professional: '전문적인',
-    heroic: '영웅적인'
   };
 
   const handleCharacterSelect = (character: Character) => {
     setSelectedCharacter(character);
   };
 
-  const handleContinue = () => {
+  const stopCurrentAudio = async () => {
+    if (currentSoundRef.current) {
+      try {
+        await currentSoundRef.current.stopAsync();
+        await currentSoundRef.current.unloadAsync();
+        currentSoundRef.current = null;
+      } catch (error) {
+        console.error('Error stopping audio:', error);
+      }
+    }
+  };
+
+  const handleContinue = async () => {
     if (selectedCharacter) {
+      await stopCurrentAudio();
       router.push({
         pathname: '/scenario-select',
         params: {
@@ -39,6 +52,12 @@ export default function CharacterSelectScreen() {
       });
     }
   };
+
+  useEffect(() => {
+    return () => {
+      stopCurrentAudio();
+    };
+  }, []);
 
   return (
     <GradientView colors={Gradients.background} style={styles.container}>
@@ -88,6 +107,8 @@ export default function CharacterSelectScreen() {
                 character={character}
                 isSelected={selectedCharacter?.id === character.id}
                 onPress={() => handleCharacterSelect(character)}
+                currentSoundRef={currentSoundRef}
+                stopCurrentAudio={stopCurrentAudio}
               />
             </View>
           ))}

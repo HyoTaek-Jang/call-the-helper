@@ -3,7 +3,9 @@ export interface Character {
   name: string;
   image: any; // For React Native image requires
   description: string;
-  voiceType: "stern" | "gentle" | "caring" | "professional" | "heroic" | "scary";
+  voiceType: "stern" | "gentle" | "professional";
+  previewAudio: any; // For React Native audio requires
+  scenarios: Scenario[];
 }
 
 export interface Scenario {
@@ -14,6 +16,7 @@ export interface Scenario {
   duration: string;
   icon?: any; // For React Native icons
   script: string;
+  audioFile: any; // For React Native audio requires
 }
 
 export interface CallSettings {

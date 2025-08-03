@@ -91,7 +91,6 @@ export default function ScenarioCard({
           <TouchableOpacity 
             style={styles.viewScriptButton}
             onPress={() => {
-              console.log('전체보기 버튼 터치됨');
               onViewScript();
             }}
             activeOpacity={0.7}

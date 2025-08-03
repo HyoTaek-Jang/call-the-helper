@@ -1,18 +1,74 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { Audio } from 'expo-av';
 import { Character } from '../types';
 
 interface CharacterCardProps {
   character: Character;
   isSelected?: boolean;
   onPress: () => void;
+  currentSoundRef: React.MutableRefObject<Audio.Sound | null>;
+  stopCurrentAudio: () => Promise<void>;
 }
 
 export const CharacterCard = ({ 
   character, 
   isSelected = false, 
-  onPress 
+  onPress,
+  currentSoundRef,
+  stopCurrentAudio 
 }: CharacterCardProps) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      if (currentSoundRef.current) {
+        currentSoundRef.current.unloadAsync();
+      }
+    };
+  }, [currentSoundRef]);
+
+  const playPreview = async () => {
+    try {
+      if (isPlaying && currentSoundRef.current) {
+        await stopCurrentAudio();
+        setIsPlaying(false);
+        return;
+      }
+
+      // Stop any currently playing sound
+      await stopCurrentAudio();
+
+      // Configure audio mode for mobile playback
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: false,
+        staysActiveInBackground: false,
+        playsInSilentModeIOS: true,
+        shouldDuckAndroid: true,
+        playThroughEarpieceAndroid: false,
+      });
+      
+      const { sound: newSound } = await Audio.Sound.createAsync(
+        character.previewAudio,
+        { shouldPlay: true, volume: 1.0 }
+      );
+      
+      currentSoundRef.current = newSound;
+      setIsPlaying(true);
+
+      newSound.setOnPlaybackStatusUpdate((status) => {
+        if (status.isLoaded && status.didJustFinish) {
+          setIsPlaying(false);
+          newSound.unloadAsync();
+          currentSoundRef.current = null;
+        }
+      });
+    } catch (error) {
+      console.error('Error playing audio:', error);
+      setIsPlaying(false);
+    }
+  };
+
   return (
     <TouchableOpacity 
       style={[
@@ -39,6 +95,17 @@ export const CharacterCard = ({
       </View>
       <Text style={styles.name}>{character.name}</Text>
       <Text style={styles.description}>{character.description}</Text>
+      <Text style={styles.scenarioCount}>{character.scenarios.length}개 시나리오</Text>
+      
+      <TouchableOpacity 
+        style={styles.previewButton}
+        onPress={playPreview}
+        activeOpacity={0.7}
+      >
+        <Text style={styles.previewButtonText}>
+          {isPlaying ? '⏸️ 정지' : '🔊 미리듣기'}
+        </Text>
+      </TouchableOpacity>
     </TouchableOpacity>
   );
 };
@@ -102,5 +169,29 @@ const styles = StyleSheet.create({
     color: '#666666',
     textAlign: 'center',
     lineHeight: 16,
+    marginBottom: 4,
+  },
+  scenarioCount: {
+    fontSize: 11,
+    color: 'hsl(210, 85%, 65%)',
+    textAlign: 'center',
+    fontWeight: '500',
+    marginBottom: 8,
+  },
+  previewButton: {
+    backgroundColor: '#f8f9fa',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 4,
+  },
+  previewButtonText: {
+    fontSize: 11,
+    color: '#495057',
+    fontWeight: '500',
   },
 });
