@@ -1,6 +1,34 @@
 import { Character } from "../types";
 
 export const characters: Character[] = [
+    {
+    id: "doctor",
+    name: "이준근 의사",
+    image: require("../assets/images/character-doctor.png"),
+    description: "건강과 생활습관을 지도하는 믿음직한 의사",
+    voiceType: "professional",
+    previewAudio: require("../assets/audios/doctor-preview.mp3"),
+    scenarios: [
+      {
+        id: "doctor-discipline",
+        title: "훈육",
+        description: "건강에 좋지 않은 행동을 할 때 교정해주는 시나리오",
+        category: "생활습관",
+        duration: "40초",
+        script: "여보세요, 이준근입니다. 네, 무슨 일이 있었나요? 음… 그건 건강에도 좋지 않은 행동이네요. 그렇게 하면 몸이 금방 피곤해지고, 감기나 다른 병에 걸리기 쉽습니다. 우리 친구가 지금부터라도 바뀔 수 있나요? 제가 이야기 해볼까요? 농답입니다! 저는 우리 친구를 믿습니다! 하지만 건강을 지키는 습관은 어릴 때부터 만들어야 합니다. 다음에 또 이런 얘기를 들으면, 제가 직접 찾아가서 건강 검진을 해야 할지도 모르겠습니다.",
+        audioFile: require("../assets/audios/doctor-discipline.mp3")
+      },
+      {
+        id: "doctor-meal",
+        title: "식사",
+        description: "식사를 잘 안 하는 아이에게 식사의 중요성을 알려주는 시나리오",
+        category: "식사예절",
+        duration: "50초",
+        script: "네, 여보세요, 이준근 선생님입니다. 네, 우리 친구가 식사를 잘 안 한다고요? 아, 밥을 거르면 몸이 약해지고, 병에 걸릴 가능성이 커집니다. 특히 어린이들은 밥에서 나오는 영양분이 아주 중요해요. 혹시 밥을 조금이라도 먹었나요? 좋아요. 그럼 오늘부터는 한 숟가락이라도 더 먹는 걸 목표로 해봅시다. 밥을 먹으면 키도 쑥쑥 크고, 몸속 군인 같은 세포들이 힘을 낼 수 있습니다. 오늘 저녁에는 꼭 챙겨 먹는 거, 약속하시죠. 약속을 지키면, 다음 진료 때 제가 '튼튼 어린이' 상을 드리겠습니다.",
+        audioFile: require("../assets/audios/doctor-meal.mp3")
+      }
+    ]
+  },
   {
     id: "police",
     name: "이유진 순경",
@@ -54,34 +82,6 @@ export const characters: Character[] = [
         duration: "60초",
         script: "여보세요, 고은 선생님입니다. 네, 장난감 때문에 친구와 다퉜다고요? 그럴 땐 서로 양보하는 게 가장 좋아요. 장난감을 혼자 오래 쓰면 다른 친구가 기다리다가 속상해질 수 있거든요. 혹시 다투기 전에 \"잠시만 기다려줄래?\"라고 말해본 적 있나요? 좋아요. 다음에는 꼭 말로 먼저 이야기해 보세요. 그렇게 하면 서로 기분이 좋아지고, 더 오래 같이 놀 수 있답니다. 선생님이 다음에 장난감 놀이하는 모습을 꼭 보고 싶어요. 그때는 서로 웃으면서 놀 수 있겠죠?",
         audioFile: require("../assets/audios/teacher-friend-conflict.mp3")
-      }
-    ]
-  },
-  {
-    id: "doctor",
-    name: "이준근 의사",
-    image: require("../assets/images/character-doctor.png"),
-    description: "건강과 생활습관을 지도하는 믿음직한 의사",
-    voiceType: "professional",
-    previewAudio: require("../assets/audios/doctor-preview.mp3"),
-    scenarios: [
-      {
-        id: "doctor-discipline",
-        title: "훈육",
-        description: "건강에 좋지 않은 행동을 할 때 교정해주는 시나리오",
-        category: "생활습관",
-        duration: "40초",
-        script: "여보세요, 이준근입니다. 네, 무슨 일이 있었나요? 음… 그건 건강에도 좋지 않은 행동이네요. 그렇게 하면 몸이 금방 피곤해지고, 감기나 다른 병에 걸리기 쉽습니다. 우리 친구가 지금부터라도 바뀔 수 있나요? 제가 이야기 해볼까요? 농답입니다! 저는 우리 친구를 믿습니다! 하지만 건강을 지키는 습관은 어릴 때부터 만들어야 합니다. 다음에 또 이런 얘기를 들으면, 제가 직접 찾아가서 건강 검진을 해야 할지도 모르겠습니다.",
-        audioFile: require("../assets/audios/doctor-discipline.mp3")
-      },
-      {
-        id: "doctor-meal",
-        title: "식사",
-        description: "식사를 잘 안 하는 아이에게 식사의 중요성을 알려주는 시나리오",
-        category: "식사예절",
-        duration: "50초",
-        script: "네, 여보세요, 이준근 선생님입니다. 네, 우리 친구가 식사를 잘 안 한다고요? 아, 밥을 거르면 몸이 약해지고, 병에 걸릴 가능성이 커집니다. 특히 어린이들은 밥에서 나오는 영양분이 아주 중요해요. 혹시 밥을 조금이라도 먹었나요? 좋아요. 그럼 오늘부터는 한 숟가락이라도 더 먹는 걸 목표로 해봅시다. 밥을 먹으면 키도 쑥쑥 크고, 몸속 군인 같은 세포들이 힘을 낼 수 있습니다. 오늘 저녁에는 꼭 챙겨 먹는 거, 약속하시죠. 약속을 지키면, 다음 진료 때 제가 '튼튼 어린이' 상을 드리겠습니다.",
-        audioFile: require("../assets/audios/doctor-meal.mp3")
       }
     ]
   },
